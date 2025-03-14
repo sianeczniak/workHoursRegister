@@ -25,8 +25,8 @@ class EmployeeService
      */
     public function createEmployee(array $data): Employee
     {
-        if (!isset($data['fullname']))
-            throw new BadRequestHttpException('Cannot create employee without a fullname');
+        if (!isset($data['fullname']) || trim($data['fullname']) == "")
+            throw new BadRequestHttpException('Nie można utworzyć pracownika bez podania imienia i nazwiska!');
 
         $employee = new Employee($data['fullname']);
 

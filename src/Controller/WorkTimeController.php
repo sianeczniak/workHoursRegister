@@ -9,31 +9,31 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
-use App\Service\EmployeeService;
+use App\Service\WorkTimeService;
 
-class EmployeeController extends AbstractController
+class WorkTimeController extends AbstractController
 {
-    private EmployeeService $employeeService;
+    private WorkTimeService $workTimeService;
 
-    public function __construct(EmployeeService $employeeService)
+    public function __construct(WorkTimeService $workTimeService)
     {
-        $this->employeeService = $employeeService;
+        $this->workTimeService = $workTimeService;
     }
 
-    #[Route('/api/employee', name: 'create_employee', methods: ['POST'])]
-    public function createEmployee(Request $request): JsonResponse
+    #[Route('/api/employee/{id}/worktime', name: 'add_worktime', methods: ['POST'])]
+    public function addWorkTime(Request $request, int $id): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
+
             if (!$data)
                 throw new BadRequestHttpException('Nieprawidłowe dane!');
-
-            $employee = $this->employeeService->createEmployee($data);
+            $data['id'] = $id;
+            $this->workTimeService->addWorkTime($data);
 
             return $this->json([
                 "response" => [
-                    'message' => 'Pracownik został dodany!',
-                    "id" => $employee->getId()
+                    "Czas pracy został dodany!"
                 ]
             ], Response::HTTP_CREATED);
         } catch (BadRequestHttpException $e) {
