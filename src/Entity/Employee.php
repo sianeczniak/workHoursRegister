@@ -22,8 +22,14 @@ class Employee
     #[ORM\OneToMany(targetEntity: WorkTime::class, mappedBy: 'employee')]
     private ?Collection $workTimes = null;
 
-    public function __construct()
+    public function __construct(string $fullname)
     {
+        $this->fullname = $fullname;
         $this->workTimes = new ArrayCollection();
+    }
+
+    public function getId(): int
+    {
+        return $this->uuid;
     }
 }
