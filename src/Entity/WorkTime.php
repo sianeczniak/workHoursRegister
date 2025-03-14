@@ -39,4 +39,14 @@ class WorkTime
         $this->timeMinutes = $timeMinutes;
         $this->employee = $employee;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'timeStart' => $this->timeStart,
+            'timeEnd' => $this->timeEnd,
+            'dateStart' => $this->dateStart,
+            'timeMinutes' => $this->timeMinutes,
+        ];
+    }
 }

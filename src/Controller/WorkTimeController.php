@@ -42,4 +42,27 @@ class WorkTimeController extends AbstractController
             ], Response::HTTP_BAD_REQUEST);
         }
     }
+
+    #[Route('/api/employee/{id}/worktime', name: 'show_worktime', methods: ['GET'])]
+    public function showWorkTime(Request $request, int $id): JsonResponse
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            if (!$data)
+                throw new BadRequestHttpException('Nieprawidłowe dane!');
+            $data['id'] = $id;
+            $workTime = $this->workTimeService->showWorkTime($data);
+
+            return $this->json([
+                "response" => [
+                    $workTime
+                ]
+            ], Response::HTTP_OK);
+        } catch (BadRequestHttpException $e) {
+            return $this->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_BAD_REQUEST);
+        }
+    }
 }
