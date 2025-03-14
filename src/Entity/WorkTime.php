@@ -19,6 +19,9 @@ class WorkTime
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $timeEnd;
 
+    #[ORM\Column(type: 'date')]
+    private \DateTimeInterface $dateStart;
+
     #[ORM\ManyToOne(targetEntity: Employee::class, inversedBy: 'workTimes')]
     #[ORM\JoinColumn(name: "employee_id", referencedColumnName: "uuid", onDelete: 'CASCADE', nullable: false)]
     private Employee $employee;
