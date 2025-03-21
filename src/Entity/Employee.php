@@ -6,15 +6,19 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Component\Uid\Uuid;
+
 #[ORM\Entity]
 #[ORM\Table(name: "employee")]
 
 class Employee
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $uuid;
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $uuid;
 
     #[ORM\Column(type: 'string', length: 100)]
     private string $fullname;
@@ -28,7 +32,7 @@ class Employee
         $this->workTimes = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): Uuid
     {
         return $this->uuid;
     }
