@@ -8,13 +8,13 @@ use Doctrine\ORM\EntityManagerInterface;
 
 use App\Entity\Employee;
 use App\Entity\WorkTime;
-use App\Service\WorkTimeConfig;
 use App\Service\WorkTimeValidator;
+use App\Service\WorkTimeCalculator;
 
 class WorkTimeService
 {
 
-    public function __construct(private EntityManagerInterface $entityManager, private WorkTimeValidator $validator) {}
+    public function __construct(private EntityManagerInterface $entityManager, private WorkTimeValidator $validator, private WorkTimeCalculator $calculator) {}
 
     /**
      * Tworzy czas pracy dla pracownika
@@ -83,7 +83,7 @@ class WorkTimeService
                 'dateStart' => $detectDate['date'],
             ]);
 
-            return self::calculateWorkTime($workTimes->toArray(), 'day');
+            return $this->calculator->calculateWorkTime($workTimes->toArray(), 'day');
         } else if ($detectDate['type'] == 'month') {
 
             $qb = $this->entityManager->createQueryBuilder();
@@ -99,7 +99,7 @@ class WorkTimeService
             $query = $qb->getQuery();
             $workTimes = $query->getResult();
 
-            return self::calculateWorkTime($workTimes, 'month');
+            return $this->calculator->calculateWorkTime($workTimes, 'month');
         }
 
         return [];
@@ -122,46 +122,5 @@ class WorkTimeService
         $dateTmp = \DateTime::createFromFormat('m.Y', $date);
         if ($dateTmp && $dateTmp->format('m.Y') === $date)
             return ['date' => $dateTmp, 'type' => 'month'];
-    }
-
-    private function calculateWorkTime(array $workTimes, string $type): array
-    {
-        $returnData = [];
-        if ($type == 'day') {
-            $returnData = [
-                "standardHours" => WorkTimeConfig::roundDailyWorkTimeToHours($workTimes['timeMinutes']),
-                "standardRate" => WorkTimeConfig::getRate(),
-            ];
-
-            $returnData['total'] = $returnData['standardHours'] * $returnData['standardRate'];
-        } else if ($type == 'month') {
-
-            $returnData = [
-                "standardHours" => 0,
-                "standardRate" => WorkTimeConfig::getRate(),
-                "overtimeHours" => 0,
-                "overtimeRate" => WorkTimeConfig::getOvertimeRate(),
-            ];
-
-            $monthlyStandardHours = WorkTimeConfig::getMonthlyStandardHours();
-
-            foreach ($workTimes as $key => $workTime) {
-                $workTime = $workTime->toArray();
-                if ($returnData['standardHours'] <= $monthlyStandardHours) {
-                    $returnData['standardHours'] += WorkTimeConfig::roundDailyWorkTimeToHours($workTime['timeMinutes']);
-
-                    if ($returnData['standardHours'] > $monthlyStandardHours) {
-                        $returnData['overtimeHours'] += $returnData['standardHours'] - $monthlyStandardHours;
-                        $returnData['standardHours'] = $monthlyStandardHours;
-                    }
-                } else {
-                    $returnData['overtimeHours'] += WorkTimeConfig::roundDailyWorkTimeToHours($workTime['timeMinutes']);
-                }
-            }
-
-            $returnData['total'] = $returnData['standardHours'] * $returnData['standardRate'] + $returnData['overtimeHours'] * $returnData['overtimeRate'];
-        }
-
-        return $returnData;
     }
 }
