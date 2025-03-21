@@ -13,6 +13,8 @@ services:
       - "3308:3306"  # Mapowanie portów
     volumes:
       - mysql-data:/var/lib/mysql  # Zapewnienie trwałości danych
+    networks:
+      - whr_network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -24,6 +26,47 @@ services:
       - "8080:80"
     depends_on:
       - database
+    networks:
+      - whr_network
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: whr_php
+    volumes:
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - .:/var/www/html
+    environment:
+      APP_ENV: dev
+      COMPOSER_HOME: /tmp/.composer
+    env_file:
+      - .env # Załaduj zmienne ze .env
+    networks:
+      - whr_network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+          
+    command: >
+      sh -c "composer dump-autoload && php-fpm"
 
+  nginx:
+    image: nginx:alpine
+    container_name: whr_nginx
+    ports:
+      - "8000:88"
+    volumes:
+      - .:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - whr_network
+
+networks:
+  whr_network:
+    driver: bridge
 volumes:
   mysql-data:  # Wolumen przechowujący dane
