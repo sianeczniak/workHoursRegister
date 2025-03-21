@@ -11,8 +11,6 @@ Jest to aplikacja webowa stworzona w Symfony 5.10.12, umożliwiająca zarządzan
 - **Docker Desktop** (do łatwego zarządzania środowiskiem)
 - **Postman** (do testowania połączenia między kontenerami oraz poprawności implementacji)
 
-I
-
 ## Instalacja
 
 1. Sklonuj repozytorium:
