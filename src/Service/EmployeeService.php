@@ -10,12 +10,7 @@ use App\Entity\Employee;
 
 class EmployeeService
 {
-    private EntityManagerInterface $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(private EntityManagerInterface $entityManager) {}
 
     /**
      * Tworzy nowego pracownika

@@ -13,12 +13,7 @@ use App\Service\EmployeeService;
 
 class EmployeeController extends AbstractController
 {
-    private EmployeeService $employeeService;
-
-    public function __construct(EmployeeService $employeeService)
-    {
-        $this->employeeService = $employeeService;
-    }
+    public function __construct(private EmployeeService $employeeService) {}
 
     #[Route('/api/employee', name: 'create_employee', methods: ['POST'])]
     public function createEmployee(Request $request): JsonResponse

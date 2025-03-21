@@ -8,6 +8,7 @@ class WorkTimeConfig
     private const RATE = 20; // PLN
     private const OVERTIME_RATE_MULTIPLIER = 2; // 200% of RATE
     private const ROUND_FACTOR = 30; // round work time per day to 30 minutes
+    private const MAX_HOURS = 12; // max of hours which employee can work on one shift
 
     public static function getMonthlyStandardHours(): int
     {
@@ -22,6 +23,11 @@ class WorkTimeConfig
     public static function getOvertimeRate(): float
     {
         return self::RATE * self::OVERTIME_RATE_MULTIPLIER;
+    }
+
+    public static function getMaxHours(): float
+    {
+        return self::MAX_HOURS;
     }
 
     public static function roundDailyWorkTimeToHours(int $realWorkTimeMinutes): float

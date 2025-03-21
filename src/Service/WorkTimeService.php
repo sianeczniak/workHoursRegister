@@ -9,15 +9,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Employee;
 use App\Entity\WorkTime;
 use App\Service\WorkTimeConfig;
+use App\Service\WorkTimeValidator;
 
 class WorkTimeService
 {
-    private EntityManagerInterface $entityManager;
 
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+    public function __construct(private EntityManagerInterface $entityManager, private WorkTimeValidator $validator) {}
 
     /**
      * Tworzy czas pracy dla pracownika
@@ -34,19 +31,13 @@ class WorkTimeService
             throw new BadRequestHttpException("Nie znaleziono pracownika!");
         }
 
-        if (!isset($data['start']) || trim($data['start']) == "" || !isset($data['end']) || trim($data['end']) == "")
-            throw new BadRequestHttpException('Puste daty czasu pracy!');
+        $data['start'] = isset($data['start']) ? $data['start'] : null;
+        $data['end'] = isset($data['end']) ? $data['end'] : null;
+        $this->validator->validate($data['start'], $data['end']);
 
         $timeStart = strtotime($data['start']);
         $timeEnd = strtotime($data['end']);
-
-        if ($timeEnd <= $timeStart)
-            throw new BadRequestHttpException('Nieprawidłowe daty czasu pracy!');
-
         $timeMinutes = round(abs($timeEnd - $timeStart) / 60);
-
-        if ($timeMinutes > 720)
-            throw new BadRequestHttpException('Zbyt duży czas pracy!');
 
         $timeStart = date("Y-m-d H:i", $timeStart);
         $timeStart = \DateTime::createFromFormat('Y-m-d H:i', $timeStart);

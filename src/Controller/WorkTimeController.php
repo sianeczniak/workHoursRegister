@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Uid\Uuid;
 
 use App\Service\WorkTimeService;
 
@@ -21,7 +22,7 @@ class WorkTimeController extends AbstractController
     }
 
     #[Route('/api/employee/{id}/worktime', name: 'add_worktime', methods: ['POST'])]
-    public function addWorkTime(Request $request, int $id): JsonResponse
+    public function addWorkTime(Request $request, Uuid $id): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
@@ -44,7 +45,7 @@ class WorkTimeController extends AbstractController
     }
 
     #[Route('/api/employee/{id}/worktime', name: 'show_worktime', methods: ['GET'])]
-    public function showWorkTime(Request $request, int $id): JsonResponse
+    public function showWorkTime(Request $request, Uuid $id): JsonResponse
     {
         try {
             $data = json_decode($request->getContent(), true);
